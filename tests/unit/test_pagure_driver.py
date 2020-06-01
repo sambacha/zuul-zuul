@@ -284,6 +284,28 @@ class TestPagureDriver(ZuulTestCase):
             ], ordered=False
         )
 
+    @simple_layout('layouts/files-pagure.yaml', driver='pagure')
+    def test_pull_matched_file_event(self):
+        A = self.fake_pagure.openFakePullRequest(
+            'org/project', 'master', 'A',
+            files={'random.txt': 'test', 'build-requires': 'test'})
+        self.fake_pagure.emitEvent(A.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        B = self.fake_pagure.openFakePullRequest('org/project', 'master', 'B',
+                                                 files={'random.txt': 'test2'})
+        self.fake_pagure.emitEvent(B.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(1, len(self.history))
+
+        C = self.fake_pagure.openFakePullRequest(
+            'org/project', 'master', 'C',
+            files={'build-requires': 'test'})
+        self.fake_pagure.emitEvent(C.getPullRequestOpenedEvent())
+        self.waitUntilSettled()
+        self.assertEqual(2, len(self.history))
+
     @simple_layout('layouts/basic-pagure.yaml', driver='pagure')
     def test_tag_created(self):
 
