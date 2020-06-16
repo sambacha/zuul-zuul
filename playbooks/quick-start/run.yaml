@@ -6,6 +6,7 @@
     - name: ensure-docker
       use_upstream_docker: false
       docker_compose_install: true
+    - ensure-pip
     - use-buildset-registry
   tasks:
     - name: Install git-review
