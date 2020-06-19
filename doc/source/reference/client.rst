@@ -147,9 +147,22 @@ Promote
 
 Example::
 
-  zuul promote --tenant openstack --pipeline check --changes 12345,1 13336,3
+  zuul promote --tenant openstack --pipeline gate --changes 12345,1 13336,3
 
 Note that the format of changes id is <number>,<patchset>.
+
+The promote action is used to reorder the change queue in a pipeline, by putting
+the provided changes at the top of the queue; therefore this action makes the
+most sense when performed against a dependent pipeline.
+
+The most common use case for the promote action is the need to merge an urgent
+fix when the gate pipeline has already several patches queued ahead. This is
+especially needed if there is concern that one or more changes ahead in the queue
+may fail, thus increasing the time to land for the fix; or concern that the fix
+may not pass validation if applied on top of the current patch queue in the gate.
+
+If the queue of a dependent pipeline is targeted by the promote, all the ongoing
+jobs in that queue will be canceled and restarted on top of the promoted changes.
 
 Show
 ^^^^
