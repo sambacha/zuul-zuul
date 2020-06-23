@@ -1131,7 +1131,7 @@ class FakePagurePullRequest(object):
     log = logging.getLogger("zuul.test.FakePagurePullRequest")
 
     def __init__(self, pagure, number, project, branch,
-                 subject, upstream_root, files=[], number_of_commits=1,
+                 subject, upstream_root, files={}, number_of_commits=1,
                  initial_comment=None):
         self.pagure = pagure
         self.source = pagure
@@ -1291,17 +1291,17 @@ class FakePagurePullRequest(object):
         return PagureChangeReference.create(
             repo, self.getPRReference(), 'refs/tags/init')
 
-    def addCommit(self, files=[]):
+    def addCommit(self, files={}):
         """Adds a commit on top of the actual PR head."""
         self._addCommitInPR(files=files)
         self._updateTimeStamp()
 
-    def forcePush(self, files=[]):
+    def forcePush(self, files={}):
         """Clears actual commits and add a commit on top of the base."""
         self._addCommitInPR(files=files, reset=True)
         self._updateTimeStamp()
 
-    def _addCommitInPR(self, files=[], reset=False):
+    def _addCommitInPR(self, files={}, reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getPRReference()]
         if reset:
