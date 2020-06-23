@@ -18,34 +18,46 @@ import { connect } from 'react-redux'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchJobsIfNeeded } from '../actions/jobs'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 import Jobs from '../containers/jobs/Jobs'
 
 
-class JobsPage extends Refreshable {
+class JobsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
 
-  updateData (force) {
+  updateData = (force) => {
     this.props.dispatch(fetchJobsIfNeeded(this.props.tenant, force))
   }
 
   componentDidMount () {
     document.title = 'Zuul Jobs'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
     const { remoteData } = this.props
+
     const jobs = remoteData.jobs[this.props.tenant.name]
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         {jobs && jobs.length > 0 &&
           <Jobs
               jobs={jobs}

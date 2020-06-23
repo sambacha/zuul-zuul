@@ -20,23 +20,31 @@ import * as moment from 'moment'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchNodesIfNeeded } from '../actions/nodes'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 
 
-class NodesPage extends Refreshable {
+class NodesPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
 
-  updateData (force) {
+  updateData = (force) => {
     this.props.dispatch(fetchNodesIfNeeded(this.props.tenant, force))
   }
 
   componentDidMount () {
     document.title = 'Zuul Nodes'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
@@ -83,9 +91,12 @@ class NodesPage extends Refreshable {
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         <Table.PfProvider
           striped
           bordered

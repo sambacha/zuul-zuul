@@ -18,16 +18,17 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildIfNeeded } from '../actions/build'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Manifest from '../containers/build/Manifest'
 
 
-class BuildLogsPage extends Refreshable {
+class BuildLogsPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    dispatch: PropTypes.func,
   }
 
   updateData = (force) => {
@@ -37,7 +38,15 @@ class BuildLogsPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Build'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
@@ -45,9 +54,12 @@ class BuildLogsPage extends Refreshable {
     const build = remoteData.builds[this.props.match.params.buildId]
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         {build && build.manifest &&
          <Build build={build} active='logs'>
            <Manifest tenant={this.props.tenant} build={build}/>

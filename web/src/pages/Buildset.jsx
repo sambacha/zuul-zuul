@@ -18,15 +18,16 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildsetIfNeeded } from '../actions/build'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 import Buildset from '../containers/build/Buildset'
 
 
-class BuildsetPage extends Refreshable {
+class BuildsetPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    dispatch: PropTypes.func,
   }
 
   updateData = (force) => {
@@ -36,17 +37,29 @@ class BuildsetPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Buildset'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
     const { remoteData } = this.props
+
     const buildset = remoteData.buildsets[this.props.match.params.buildsetId]
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         {buildset && <Buildset buildset={buildset}/>}
       </PageSection>
     )

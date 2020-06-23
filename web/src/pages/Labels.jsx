@@ -19,10 +19,10 @@ import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchLabelsIfNeeded } from '../actions/labels'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable, Fetching } from '../containers/Fetching'
 
 
-class LabelsPage extends Refreshable {
+class LabelsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
@@ -35,7 +35,15 @@ class LabelsPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Labels'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
@@ -43,7 +51,7 @@ class LabelsPage extends Refreshable {
     const labels = remoteData.labels[this.props.tenant.name]
 
     if (!labels) {
-      return (<p>Loading...</p>)
+      return <Fetching />
     }
 
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
@@ -61,9 +69,12 @@ class LabelsPage extends Refreshable {
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         <Table.PfProvider
           striped
           bordered

@@ -19,11 +19,11 @@ import { Link } from 'react-router-dom'
 import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
-import Refreshable from '../containers/Refreshable'
+import { Fetching } from '../containers/Fetching'
 import { fetchTenantsIfNeeded } from '../actions/tenants'
 
 
-class TenantsPage extends Refreshable {
+class TenantsPage extends React.Component {
   static propTypes = {
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
@@ -43,6 +43,10 @@ class TenantsPage extends Refreshable {
 
   render () {
     const { remoteData } = this.props
+    if (remoteData.isFetching) {
+      return <Fetching />
+    }
+
     const tenants = remoteData.tenants
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
     const cellFormat = (value) => (
@@ -79,9 +83,6 @@ class TenantsPage extends Refreshable {
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
         <Table.PfProvider
           striped
           bordered

@@ -18,16 +18,18 @@ import PropTypes from 'prop-types'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchBuildIfNeeded } from '../actions/build'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 import Build from '../containers/build/Build'
 import Console from '../containers/build/Console'
 
 
-class BuildConsolePage extends Refreshable {
+class BuildConsolePage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     remoteData: PropTypes.object,
-    tenant: PropTypes.object
+    tenant: PropTypes.object,
+    dispatch: PropTypes.func,
+    location: PropTypes.object,
   }
 
   updateData = (force) => {
@@ -37,7 +39,15 @@ class BuildConsolePage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Build'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
@@ -47,9 +57,12 @@ class BuildConsolePage extends Refreshable {
 
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         {build && build.output &&
          <Build build={build} active='console'>
            <Console
