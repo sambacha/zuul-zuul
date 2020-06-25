@@ -27,13 +27,13 @@ COPY . /tmp/src
 RUN /tmp/src/tools/install-js-tools.sh
 # Explicitly run the Javascript build
 RUN cd /tmp/src/web && yarn install -d && yarn build
-RUN assemble
+RUN DEBIAN_FRONTEND=noninteractive assemble
 
 # The wheel install method doesn't run the setup hooks as the source based
 # installations do so we have to call zuul-manage-ansible here. Remove
 # /root/.local/share/virtualenv after because it adds wheels into /root
 # that we don't need after the install step so are a waste of space.
-RUN /output/install-from-bindep && zuul-manage-ansible && rm -rf /root/.local/share/virtualenv
+RUN DEBIAN_FRONTEND=noninteractive /output/install-from-bindep && zuul-manage-ansible && rm -rf /root/.local/share/virtualenv
 
 RUN mkdir /tmp/openshift-install \
   && curl -L $OPENSHIFT_URL -o /tmp/openshift-install/openshift-client.tgz \
@@ -44,7 +44,7 @@ RUN mkdir /tmp/openshift-install \
 FROM docker.io/opendevorg/python-base:3.7 as zuul
 
 COPY --from=builder /output/ /output
-RUN /output/install-from-bindep \
+RUN DEBIAN_FRONTEND=noninteractive /output/install-from-bindep \
   && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
   && rm -rf /output
 RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
