@@ -306,13 +306,27 @@ class TestChecksApi(ZuulTestCase):
 
         self.assertEqual(A.checks_history[0]['zuul:check']['state'],
                          'NOT_STARTED')
+
         self.assertEqual(A.checks_history[1]['zuul:check']['state'],
                          'SCHEDULED')
+        self.assertEqual(
+            A.checks_history[1]['zuul:check']['url'],
+            'http://zuul.example.com/t/tenant-one/status/change/2,1')
+
         self.assertEqual(A.checks_history[2]['zuul:check']['state'],
                          'RUNNING')
+        self.assertEqual(
+            A.checks_history[2]['zuul:check']['url'],
+            'http://zuul.example.com/t/tenant-one/status/change/2,1')
+
         self.assertEqual(A.checks_history[3]['zuul:check']['state'],
                          'SUCCESSFUL')
+        self.assertTrue(
+            A.checks_history[3]['zuul:check']['url'].startswith(
+                'http://zuul.example.com/t/tenant-one/buildset/'))
+
         self.assertEqual(len(A.checks_history), 4)
+
         self.assertTrue(isinstance(
             A.checks_history[3]['zuul:check']['started'], str))
         self.assertTrue(isinstance(
