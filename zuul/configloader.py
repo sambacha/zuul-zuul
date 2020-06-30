@@ -2252,7 +2252,7 @@ class ConfigLoader(object):
 
     def _loadDynamicProjectData(self, config, project,
                                 files, trusted, tenant, loading_errors,
-                                ansible_manager, pcontext):
+                                pcontext):
         tpc = tenant.project_configs[project.canonical_name]
         if trusted:
             branches = ['master']
@@ -2329,7 +2329,6 @@ class ConfigLoader(object):
 
     def createDynamicLayout(self, tenant, files, ansible_manager,
                             include_config_projects=False,
-                            scheduler=None, connections=None,
                             zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
         pcontext = ParseContext(self.connections, self.scheduler,
@@ -2338,16 +2337,14 @@ class ConfigLoader(object):
         if include_config_projects:
             config = model.ParsedConfig()
             for project in tenant.config_projects:
-                self._loadDynamicProjectData(
-                    config, project, files, True, tenant, loading_errors,
-                    ansible_manager, pcontext)
+                self._loadDynamicProjectData(config, project, files, True,
+                                             tenant, loading_errors, pcontext)
         else:
             config = tenant.config_projects_config.copy()
 
         for project in tenant.untrusted_projects:
-            self._loadDynamicProjectData(
-                config, project, files, False, tenant, loading_errors,
-                ansible_manager, pcontext)
+            self._loadDynamicProjectData(config, project, files, False, tenant,
+                                         loading_errors, pcontext)
 
         layout = model.Layout(tenant)
         layout.loading_errors = loading_errors
