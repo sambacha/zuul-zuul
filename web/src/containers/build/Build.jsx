@@ -16,7 +16,6 @@ import * as React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Panel } from 'react-bootstrap'
 
 class Build extends React.Component {
   static propTypes = {
@@ -29,9 +28,8 @@ class Build extends React.Component {
   render () {
     const { build, active } = this.props
     return (
-      <Panel>
-        <Panel.Heading>Build result {build.uuid}</Panel.Heading>
-        <Panel.Body>
+      <div>
+      <h2>Build result {build.uuid}</h2>
             <div>
               <ul className="nav nav-tabs nav-tabs-pf">
                 <li className={active==='summary'?'active':undefined}>
@@ -58,8 +56,7 @@ class Build extends React.Component {
                 {this.props.children}
               </div>
             </div>
-        </Panel.Body>
-      </Panel>
+        </div>
     )
   }
 }
