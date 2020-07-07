@@ -108,7 +108,11 @@
     parent: python27
     name: timeout
     run: playbooks/timeout.yaml
-    timeout: 10
+    # Give the job enough time to reach the run phase but less than 60s
+    # which is the time the run playbook waits to trigger a job timeout.
+    # It needs to reach the run phase since timeouting in the pre-run phase
+    # will lead to a job retry.
+    timeout: 20
 
 - job:
     parent: python27
