@@ -14,6 +14,7 @@
 # limitations under the License.
 
 FROM docker.io/opendevorg/python-builder:3.7 as builder
+ENV DEBIAN_FRONTEND=noninteractive
 
 # Optional location of Zuul API endpoint.
 ARG REACT_APP_ZUUL_API
@@ -42,6 +43,7 @@ RUN mkdir /tmp/openshift-install \
   && tar xvfz openshift-client.tgz --strip-components=1 -C /tmp/openshift-install
 
 FROM docker.io/opendevorg/python-base:3.7 as zuul
+ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
 RUN /output/install-from-bindep \
@@ -53,6 +55,7 @@ VOLUME /var/lib/zuul
 CMD ["/usr/local/bin/zuul"]
 
 FROM zuul as zuul-executor
+ENV DEBIAN_FRONTEND=noninteractive
 COPY --from=builder /usr/local/lib/zuul/ /usr/local/lib/zuul
 COPY --from=builder /tmp/openshift-install/kubectl /usr/local/bin/kubectl
 COPY --from=builder /tmp/openshift-install/oc /usr/local/bin/oc
