@@ -1617,11 +1617,13 @@ class GithubConnection(BaseConnection):
         reviews = {}
 
         for rev in revs:
-            user = rev.get('user').get('login')
+            login = rev.get('user').get('login')
+            user = self.getUser(login, project)
+
             review = {
                 'by': {
-                    'username': user,
-                    'email': rev.get('user').get('email'),
+                    'username': user.get('username'),
+                    'email': user.get('email'),
                 },
                 'grantedOn': int(time.mktime(self._ghTimestampToDate(
                                              rev.get('submitted_at')))),
@@ -1633,19 +1635,19 @@ class GithubConnection(BaseConnection):
             # Get user's rights. A user always has read to leave a review
             review['permission'] = 'read'
 
-            if user in permissions:
-                permission = permissions[user]
+            if login in permissions:
+                permission = permissions[login]
             else:
-                permission = self.getRepoPermission(project.name, user)
-                permissions[user] = permission
+                permission = self.getRepoPermission(project.name, login)
+                permissions[login] = permission
 
             if permission == 'write':
                 review['permission'] = 'write'
             if permission == 'admin':
                 review['permission'] = 'admin'
 
-            if user not in reviews:
-                reviews[user] = review
+            if login not in reviews:
+                reviews[login] = review
             else:
                 # if there are multiple reviews per user, keep the newest
                 # note that this breaks the ability to set the 'older-than'
@@ -1654,15 +1656,16 @@ class GithubConnection(BaseConnection):
                 # previous review was 'approved' or 'changes_requested', as
                 # the GitHub model does not change the vote if a comment is
                 # added after the fact. THANKS GITHUB!
-                if review['grantedOn'] > reviews[user]['grantedOn']:
-                    if (review['type'] == 'commented' and reviews[user]['type']
-                            in ('approved', 'changes_requested')):
+                if review['grantedOn'] > reviews[login]['grantedOn']:
+                    if (review['type'] == 'commented' and
+                        reviews[login]['type'] in
+                        ('approved', 'changes_requested')):
                         log.debug("Discarding comment review %s due to "
                                   "an existing vote %s" % (review,
-                                                           reviews[user]))
+                                                           reviews[login]))
                         pass
                     else:
-                        reviews[user] = review
+                        reviews[login] = review
 
         return reviews.values()
 
