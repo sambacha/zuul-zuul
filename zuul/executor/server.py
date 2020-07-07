@@ -2942,9 +2942,14 @@ class ExecutorServer(BaseMergeServer):
         """
         The executor overrides _update so it can do the update asynchronously.
         """
+        log = get_annotated_logger(self.log, zuul_event_id)
         task = self.update(connection_name, project_name,
                            zuul_event_id=zuul_event_id)
         task.wait()
+        if not task.success:
+            msg = "Update of '{}' failed".format(project_name)
+            log.error(msg)
+            raise Exception(msg)
 
     def executeJob(self, job):
         args = json.loads(job.arguments)
