@@ -23,6 +23,7 @@ import {
   FormGroup,
   FormControl,
 } from 'patternfly-react'
+import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchStatusIfNeeded } from '../actions/status'
 import Pipeline from '../containers/status/Pipeline'
@@ -212,7 +213,7 @@ class StatusPage extends Refreshable {
       </Form>
     )
     return (
-      <React.Fragment>
+      <PageSection variant={PageSectionVariants.light}>
         <div className="pull-right" style={{display: 'flex'}}>
           {this.renderSpinner()}
           <Checkbox
@@ -225,7 +226,7 @@ class StatusPage extends Refreshable {
 
         {status && this.renderStatusHeader(status)}
         {statusControl}
-        <div className='row'>
+        <div className='row zuul-status-content'>
           {status && status.pipelines.map(item => (
             <Pipeline
               pipeline={item}
@@ -236,7 +237,7 @@ class StatusPage extends Refreshable {
           ))}
         </div>
         {status && this.renderStatusFooter(status)}
-      </React.Fragment>)
+      </PageSection>)
   }
 }
 
