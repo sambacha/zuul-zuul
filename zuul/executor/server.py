@@ -1587,6 +1587,9 @@ class AnsibleJob(object):
                         host_keys.append("[%s]:%s %s" % (ip, port, key))
                     else:
                         host_keys.append("%s %s" % (ip, key))
+                if not node.get('host_keys'):
+                    host_vars['ansible_ssh_common_args'] = \
+                        '-o StrictHostKeyChecking=false'
 
                 hosts.append(dict(
                     name=name,
