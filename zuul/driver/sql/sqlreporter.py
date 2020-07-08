@@ -30,10 +30,7 @@ class SQLReporter(BaseReporter):
     log = logging.getLogger("zuul.SQLReporter")
 
     def _getBuildData(self, item, job, build):
-        (result, url) = item.formatJobResult(job, build)
-        log_url = build.result_data.get('zuul', {}).get('log_url')
-        if log_url and log_url[-1] != '/':
-            log_url = log_url + '/'
+        (result, _) = item.formatJobResult(job, build)
         start = end = None
         if build.start_time:
             start = datetime.datetime.fromtimestamp(
@@ -43,7 +40,7 @@ class SQLReporter(BaseReporter):
             end = datetime.datetime.fromtimestamp(
                 build.end_time,
                 tz=datetime.timezone.utc)
-        return result, log_url, start, end
+        return result, build.log_url, start, end
 
     def createBuildEntry(self, item, job, db_buildset, build, final=True):
         # Ensure end_time is defined
