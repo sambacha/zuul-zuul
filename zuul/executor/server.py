@@ -2608,6 +2608,14 @@ class ExecutorServer(BaseMergeServer):
                 # We use rm here instead of shutil because of
                 # https://bugs.python.org/issue22040
                 jobdir = os.path.join(self.jobdir_root, fn)
+                # First we need to ensure all directories are
+                # writable to avoid permission denied error
+                subprocess.Popen([
+                    "find", jobdir,
+                    # Filter non writable perms
+                    "-type", "d", "!", "-perm", "/u+w",
+                    # Replace by writable perms
+                    "-exec", "chmod", "0700", "{}", "+"]).wait()
                 if subprocess.Popen(["rm", "-Rf", jobdir]).wait():
                     raise RuntimeError("Couldn't delete: " + jobdir)
 
