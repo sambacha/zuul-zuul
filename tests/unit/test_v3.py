@@ -5531,6 +5531,22 @@ class TestJobPause(AnsibleZuulTestCase):
             dict(name='test2-after-compile1', result='SUCCESS', changes='1,1'),
         ], ordered=False)
 
+    def test_job_pause_fail(self):
+        """
+        Test that only succeeding jobs are allowed to pause.
+
+        compile-fail
+        +--> after-compile
+        """
+        A = self.fake_gerrit.addFakeChange('org/project4', 'master', 'A')
+
+        self.fake_gerrit.addEvent(A.getPatchsetCreatedEvent(1))
+        self.waitUntilSettled()
+
+        self.assertHistory([
+            dict(name='compile-fail', result='FAILURE', changes='1,1'),
+        ])
+
     def test_job_node_failure_resume(self):
         self.wait_timeout = 120
 
