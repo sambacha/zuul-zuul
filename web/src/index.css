@@ -253,6 +253,12 @@ pre.version {
 .zuul-console .additionalinfo-icon
 {
     cursor: default;
+    margin-right: 8px;
+}
+.zuul-console .task-details-icon
+{
+    cursor: pointer;
+    margin-right: 8px;
 }
 .zuul-console-modal-header-link
 {
