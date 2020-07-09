@@ -73,7 +73,7 @@
       - web/.*
       - playbooks/dashboard/.*
     vars:
-      javascript_content_dir: "../zuul/web/static"
+      javascript_content_dir: "build"
       zuul_work_dir: "{{ zuul.project.src_dir }}/web"
       create_tarball_directory: build
     run: playbooks/dashboard/run.yaml
