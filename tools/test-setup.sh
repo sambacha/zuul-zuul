@@ -25,7 +25,7 @@ sudo service zookeeper start
 
 # The root password for the MySQL database; pass it in via
 # MYSQL_ROOT_PW.
-DB_ROOT_PW=${MYSQL_ROOT_PW:-insecure_slave}
+DB_ROOT_PW=${MYSQL_ROOT_PW:-insecure_worker}
 
 # This user and its password are used by the tests, if you change it,
 # your tests might fail.

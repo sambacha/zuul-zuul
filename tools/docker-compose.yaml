@@ -5,7 +5,7 @@ services:
     container_name: zuul-test-mysql
     image: mysql:5.7
     environment:
-      - MYSQL_ROOT_PASSWORD=insecure_slave
+      - MYSQL_ROOT_PASSWORD=insecure_worker
     ports:
       - "3306:3306"
     tmpfs:

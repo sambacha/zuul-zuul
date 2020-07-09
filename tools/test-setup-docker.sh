@@ -25,7 +25,7 @@ else
 fi
 
 
-MYSQL="${DOCKER} exec zuul-test-mysql mysql  -u root -pinsecure_slave"
+MYSQL="${DOCKER} exec zuul-test-mysql mysql  -u root -pinsecure_worker"
 
 if [ "${COMPOSE}" == "docker-compose" ]; then
   docker-compose rm -sf
