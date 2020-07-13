@@ -81,7 +81,7 @@ class App extends React.Component {
     location: PropTypes.object,
     history: PropTypes.object,
     dispatch: PropTypes.func,
-    isKebabDropdownOpen: false,
+    isKebabDropdownOpen: PropTypes.bool,
   }
 
   state = {
