@@ -20,31 +20,43 @@ import { Table } from 'patternfly-react'
 import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import { fetchProjectsIfNeeded } from '../actions/projects'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable, Fetching } from '../containers/Fetching'
 
 
-class ProjectsPage extends Refreshable {
+class ProjectsPage extends React.Component {
   static propTypes = {
     tenant: PropTypes.object,
     remoteData: PropTypes.object,
     dispatch: PropTypes.func
   }
 
-  updateData (force) {
+  updateData = (force) => {
     this.props.dispatch(fetchProjectsIfNeeded(this.props.tenant, force))
   }
 
   componentDidMount () {
     document.title = 'Zuul Projects'
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
     const { remoteData } = this.props
     const projects = remoteData.projects[this.props.tenant.name]
 
+    // TODO (felix): Can we somehow differentiate between "no projects yet" (due
+    // to fetching) and "no projects at all", so we could show an empty state
+    // in the latter case. The same applies for other pages like labels, nodes,
+    // buildsets, ... as well.
     if (!projects) {
-      return (<p>Loading...</p>)
+      return <Fetching />
     }
 
     const headerFormat = value => <Table.Heading>{value}</Table.Heading>
@@ -86,9 +98,12 @@ class ProjectsPage extends Refreshable {
     })
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         <Table.PfProvider
           striped
           bordered

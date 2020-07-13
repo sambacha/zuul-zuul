@@ -19,10 +19,10 @@ import { PageSection, PageSectionVariants } from '@patternfly/react-core'
 
 import Project from '../containers/project/Project'
 import { fetchProjectIfNeeded } from '../actions/project'
-import Refreshable from '../containers/Refreshable'
+import { Fetchable } from '../containers/Fetching'
 
 
-class ProjectPage extends Refreshable {
+class ProjectPage extends React.Component {
   static propTypes = {
     match: PropTypes.object.isRequired,
     tenant: PropTypes.object,
@@ -37,7 +37,15 @@ class ProjectPage extends Refreshable {
 
   componentDidMount () {
     document.title = 'Zuul Project | ' + this.props.match.params.projectName
-    super.componentDidMount()
+    if (this.props.tenant.name) {
+      this.updateData()
+    }
+  }
+
+  componentDidUpdate (prevProps) {
+    if (this.props.tenant.name !== prevProps.tenant.name) {
+      this.updateData()
+    }
   }
 
   render () {
@@ -46,9 +54,12 @@ class ProjectPage extends Refreshable {
     const projectName = this.props.match.params.projectName
     return (
       <PageSection variant={PageSectionVariants.light}>
-        <div style={{float: 'right'}}>
-          {this.renderSpinner()}
-        </div>
+        <PageSection style={{paddingRight: '5px'}}>
+          <Fetchable
+            isFetching={remoteData.isFetching}
+            fetchCallback={this.updateData}
+          />
+        </PageSection>
         {tenantProjects && tenantProjects[projectName] &&
          <Project project={tenantProjects[projectName]} />}
       </PageSection>
