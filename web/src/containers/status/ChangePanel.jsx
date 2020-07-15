@@ -120,7 +120,7 @@ class ChangePanel extends React.Component {
   }
 
   renderProgressBar (change) {
-    let jobPercent = Math.floor(100 / change.jobs.length)
+    let jobPercent = (100 / change.jobs.length).toFixed(2)
     return (
       <div className='progress zuul-change-total-result'>
         {change.jobs.map((job, idx) => {
