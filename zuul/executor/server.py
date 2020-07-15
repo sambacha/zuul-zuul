@@ -1418,7 +1418,7 @@ class AnsibleJob(object):
         # check if we need to pause here
         result_data = self.getResultData()
         pause = result_data.get('zuul', {}).get('pause')
-        if pause:
+        if success and pause:
             self.pause()
         if self.aborted:
             return 'ABORTED'
