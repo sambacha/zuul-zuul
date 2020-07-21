@@ -18,7 +18,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { matchPath, withRouter } from 'react-router'
-import { Link, Redirect, Route, Switch } from 'react-router-dom'
+import { Link, NavLink, Redirect, Route, Switch } from 'react-router-dom'
 import { connect } from 'react-redux'
 import {
   TimedToastNotification,
@@ -90,27 +90,19 @@ class App extends React.Component {
   }
 
   renderMenu() {
-    const { location, tenant } = this.props
-    const activeItem = this.menu.find(
-      item => location.pathname === item.to
-    )
-
+    const { tenant } = this.props
     if (tenant.name) {
       return (
         <Nav aria-label="Nav" variant="horizontal">
           <NavList>
             {this.menu.filter(item => item.title).map(item => (
-              <NavItem
-                itemId={item.to}
-                key={item.to}
-                isActive={item === activeItem}
-              >
-                <Link
-                  to={this.props.tenant.linkPrefix + item.to}
-                  onClick={this.onNavClick}
+              <NavItem itemId={item.to} key={item.to}>
+                <NavLink
+                  to={tenant.linkPrefix + item.to}
+                  activeClassName="pf-c-nav__link pf-m-current"
                 >
                   {item.title}
-                </Link>
+                </NavLink>
               </NavItem>
             ))}
           </NavList>
