@@ -24,6 +24,11 @@ import {
   Col,
   Modal,
 } from 'patternfly-react'
+import {
+  ContainerNodeIcon,
+  InfoCircleIcon,
+  SearchPlusIcon,
+} from '@patternfly/react-icons'
 
 import {
   hasInterestingKeys,
@@ -181,30 +186,42 @@ class HostTask extends React.Component {
     if (this.state.failed) {
       ai.push(
         <ListView.InfoItem key="failed" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <SearchPlusIcon />
+          </span>
           <span className="task-failed" onClick={this.open}>FAILED</span>
         </ListView.InfoItem>)
     } else if (this.state.changed) {
       ai.push(
         <ListView.InfoItem key="changed" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <SearchPlusIcon />
+          </span>
           <span className="task-changed" onClick={this.open}>CHANGED</span>
         </ListView.InfoItem>)
     } else if (this.state.skipped) {
       ai.push(
         <ListView.InfoItem key="skipped" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <SearchPlusIcon />
+          </span>
           <span className="task-skipped" onClick={this.open}>SKIPPED</span>
         </ListView.InfoItem>)
     } else if (this.state.ok) {
       ai.push(
         <ListView.InfoItem key="ok" title="Click for details">
+          <span className="task-details-icon" onClick={this.open}>
+            <SearchPlusIcon />
+          </span>
           <span className="task-ok" onClick={this.open}>OK</span>
         </ListView.InfoItem>)
     }
     ai.push(
       <ListView.InfoItem key="hostname">
         <span className="additionalinfo-icon">
-          <Icon type='pf' name='container-node' />
-          {hostname}
+          <ContainerNodeIcon />
         </span>
+        {hostname}
       </ListView.InfoItem>
     )
 
@@ -304,8 +321,9 @@ class PlayBook extends React.Component {
       ai.push(
         <ListView.InfoItem key="trusted" title="This playbook runs in a trusted execution context, which permits executing code on the Zuul executor and allows access to all Ansible features.">
           <span className="additionalinfo-icon">
-            <Icon type='pf' name='info' /> Trusted
+            <InfoCircleIcon />
           </span>
+          Trusted
         </ListView.InfoItem>
       )
     }
