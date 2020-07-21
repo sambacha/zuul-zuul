@@ -363,7 +363,7 @@ class GithubEventProcessor(object):
             self._process_event()
         finally:
             self.log.debug("Finished event processing")
-            return self.event
+        return self.event
 
     def _process_event(self):
         if self.connector._stopped:
