@@ -375,13 +375,15 @@ class GithubEventProcessor(object):
         project_name = self.body.get('repository', {}).get('full_name')
 
         if installation_id and project_name:
-            old_id = self.connection.installation_map.get(project_name)
+            installation_map = \
+                self.connection._github_client_manager.installation_map
+            old_id = installation_map.get(project_name)
 
             if old_id and old_id != installation_id:
                 msg = "Unexpected installation_id change for %s. %d -> %d."
                 self.log.warning(msg, project_name, old_id, installation_id)
 
-            self.connection.installation_map[project_name] = installation_id
+            installation_map[project_name] = installation_id
 
         try:
             method = getattr(self, '_event_' + self.event_type)
