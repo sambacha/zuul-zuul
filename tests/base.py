@@ -2101,6 +2101,12 @@ class FakeGithubPullRequest(object):
             'sender': {
                 'login': 'ghuser'
             },
+            'repository': {
+                'full_name': self.project,
+            },
+            'installation': {
+                'id': 123,
+            },
             'labels': [{'name': l} for l in self.labels]
         }
         return (name, data)
