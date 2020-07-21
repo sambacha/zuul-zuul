@@ -396,10 +396,13 @@ class App extends React.Component {
       </PageHeaderTools>
     )
 
+    // In case we don't have an active tenant, fall back to the root URL
+    const logoUrl = tenant.name ? tenant.defaultRoute : '/'
     const pageHeader = (
       <PageHeader
         logo={<Brand src={logo} alt='Zuul logo' className="zuul-brand" />}
-        logoProps={{href: tenant.defaultRoute}}
+        logoProps={{to: logoUrl}}
+        logoComponent={Link}
         headerTools={pageHeaderTools}
         topNav={nav}
       />
