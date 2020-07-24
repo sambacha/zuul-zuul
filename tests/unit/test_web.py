@@ -2220,3 +2220,89 @@ class TestCLIViaWebApi(BaseTestWeb):
         self.executor_server.release()
         self.waitUntilSettled()
         self.assertEqual(self.countJobResults(self.history, 'ABORTED'), 1)
+
+    def test_promote(self):
+        "Test that the RPC client can promote a change"
+        self.executor_server.hold_jobs_in_build = True
+        A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
+        B = self.fake_gerrit.addFakeChange('org/project', 'master', 'B')
+        C = self.fake_gerrit.addFakeChange('org/project', 'master', 'C')
+        A.addApproval('Code-Review', 2)
+        B.addApproval('Code-Review', 2)
+        C.addApproval('Code-Review', 2)
+
+        self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+
+        self.waitUntilSettled()
+
+        tenant = self.scheds.first.sched.abide.tenants.get('tenant-one')
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        enqueue_times = {}
+        for item in items:
+            enqueue_times[str(item.change)] = item.enqueue_time
+
+        # Promote B and C using the cli
+        authz = {'iss': 'zuul_operator',
+                 'aud': 'zuul.example.com',
+                 'sub': 'testuser',
+                 'zuul': {
+                     'admin': ['tenant-one', ]
+                 },
+                 'exp': time.time() + 3600}
+        token = jwt.encode(authz, key='NoDanaOnlyZuul',
+                           algorithm='HS256').decode('utf-8')
+        p = subprocess.Popen(
+            [os.path.join(sys.prefix, 'bin/zuul'),
+             '--zuul-url', self.base_url, '--auth-token', token,
+             'promote', '--tenant', 'tenant-one',
+             '--pipeline', 'gate', '--changes', '2,1', '3,1'],
+            stdout=subprocess.PIPE)
+        output = p.communicate()
+        self.assertEqual(p.returncode, 0, output[0])
+        self.waitUntilSettled()
+
+        # ensure that enqueue times are durable
+        items = tenant.layout.pipelines['gate'].getAllItems()
+        for item in items:
+            self.assertEqual(
+                enqueue_times[str(item.change)], item.enqueue_time)
+
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+        self.executor_server.release('.*-merge')
+        self.waitUntilSettled()
+
+        self.assertEqual(len(self.builds), 6)
+        self.assertEqual(self.builds[0].name, 'project-test1')
+        self.assertEqual(self.builds[1].name, 'project-test2')
+        self.assertEqual(self.builds[2].name, 'project-test1')
+        self.assertEqual(self.builds[3].name, 'project-test2')
+        self.assertEqual(self.builds[4].name, 'project-test1')
+        self.assertEqual(self.builds[5].name, 'project-test2')
+
+        self.assertTrue(self.builds[0].hasChanges(B))
+        self.assertFalse(self.builds[0].hasChanges(A))
+        self.assertFalse(self.builds[0].hasChanges(C))
+
+        self.assertTrue(self.builds[2].hasChanges(B))
+        self.assertTrue(self.builds[2].hasChanges(C))
+        self.assertFalse(self.builds[2].hasChanges(A))
+
+        self.assertTrue(self.builds[4].hasChanges(B))
+        self.assertTrue(self.builds[4].hasChanges(C))
+        self.assertTrue(self.builds[4].hasChanges(A))
+
+        self.executor_server.release()
+        self.waitUntilSettled()
+
+        self.assertEqual(A.data['status'], 'MERGED')
+        self.assertEqual(A.reported, 2)
+        self.assertEqual(B.data['status'], 'MERGED')
+        self.assertEqual(B.reported, 2)
+        self.assertEqual(C.data['status'], 'MERGED')
+        self.assertEqual(C.reported, 2)
