@@ -1726,6 +1726,10 @@ class FakeGitlabMergeRequest(object):
             }
         )
 
+    def addCommit(self, files=[]):
+        self._addCommitInMR(files=files)
+        self._updateTimeStamp()
+
     def _addCommitInMR(self, files=[], reset=False):
         repo = self._getRepo()
         ref = repo.references[self.getMRReference()]
@@ -1780,8 +1784,7 @@ class FakeGitlabMergeRequest(object):
         return (name, data)
 
     def getMergeRequestUpdatedEvent(self):
-        self._addCommitInMR()
-        self._updateTimeStamp()
+        self.addCommit()
         return self.getMergeRequestOpenedEvent()
 
     def getMergeRequestCommentedEvent(self, note):
