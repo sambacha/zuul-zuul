@@ -1819,7 +1819,7 @@ class FakeGithubPullRequest(object):
 
     def __init__(self, github, number, project, branch,
                  subject, upstream_root, files=[], number_of_commits=1,
-                 writers=[], body=None, draft=False):
+                 writers=[], body=None, body_text=None, draft=False):
         """Creates a new PR with several commits.
         Sends an event about opened PR."""
         self.github = github
@@ -1829,6 +1829,7 @@ class FakeGithubPullRequest(object):
         self.branch = branch
         self.subject = subject
         self.body = body
+        self.body_text = body_text
         self.draft = draft
         self.number_of_commits = 0
         self.upstream_root = upstream_root
@@ -2238,11 +2239,11 @@ class FakeGithubConnection(githubconnection.GithubConnection):
         self.zuul_web_port = port
 
     def openFakePullRequest(self, project, branch, subject, files=[],
-                            body=None, draft=False):
+                            body=None, body_text=None, draft=False):
         self.pr_number += 1
         pull_request = FakeGithubPullRequest(
             self, self.pr_number, project, branch, subject, self.upstream_root,
-            files=files, body=body, draft=draft)
+            files=files, body=body, body_text=body_text, draft=draft)
         self.pull_requests[self.pr_number] = pull_request
         return pull_request
 
