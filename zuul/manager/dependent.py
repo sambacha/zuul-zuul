@@ -92,7 +92,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                                change_queue))
                     continue
             source = other_change.project.source
-            if source.canMerge(other_change, self.getSubmitAllowNeeds()):
+            if source.canMerge(other_change, self.getSubmitAllowNeeds(),
+                               event=event):
                 log.debug("  Change %s needs %s and is ready to merge",
                           other_change, change)
                 to_enqueue.append(other_change)
@@ -168,7 +169,8 @@ class DependentPipelineManager(SharedQueuePipelineManager):
                     log.debug("  Needed change is already ahead in the queue")
                     continue
                 if needed_change.project.source.canMerge(
-                        needed_change, self.getSubmitAllowNeeds()):
+                        needed_change, self.getSubmitAllowNeeds(),
+                        event=event):
                     log.debug("  Change %s is needed", needed_change)
                     if needed_change not in changes_needed:
                         changes_needed.append(needed_change)
