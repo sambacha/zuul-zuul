@@ -106,8 +106,8 @@ class TestExecutorRepos(ZuulTestCase):
         A.addApproval('Code-Review', 2)
         B.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
-
         self.waitUntilSettled()
 
         self.assertEqual(2, len(self.builds), "Two builds are running")
@@ -145,9 +145,10 @@ class TestExecutorRepos(ZuulTestCase):
         B.addApproval('Code-Review', 2)
         C.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
-
         self.waitUntilSettled()
 
         self.assertEqual(3, len(self.builds), "Three builds are running")
@@ -205,10 +206,12 @@ class TestExecutorRepos(ZuulTestCase):
         C.addApproval('Code-Review', 2)
         D.addApproval('Code-Review', 2)
         self.fake_gerrit.addEvent(A.addApproval('Approved', 1))
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(B.addApproval('Approved', 1))
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(C.addApproval('Approved', 1))
+        self.waitUntilSettled()
         self.fake_gerrit.addEvent(D.addApproval('Approved', 1))
-
         self.waitUntilSettled()
 
         self.assertEqual(4, len(self.builds), "Four builds are running")
