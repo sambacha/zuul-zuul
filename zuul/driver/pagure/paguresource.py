@@ -62,7 +62,7 @@ class PagureSource(BaseSource):
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
 
-    def getChangeByURL(self, url):
+    def getChangeByURL(self, url, event):
         try:
             parsed = urllib.parse.urlparse(url)
         except ValueError:
@@ -75,14 +75,15 @@ class PagureSource(BaseSource):
             num = int(m.group(2))
         except ValueError:
             return None
-        pull = self.connection.getPull(project_name, num)
+        pull = self.connection.getPull(project_name, num, event=event)
         if not pull:
             return None
         project = self.getProject(project_name)
         change = self.connection._getChange(
             project, num,
             patchset=pull.get('commit_stop'),
-            url=url)
+            url=url,
+            event=event)
         return change
 
     def getChangesDependingOn(self, change, projects, tenant):

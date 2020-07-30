@@ -67,7 +67,7 @@ class GithubSource(BaseSource):
 
     change_re = re.compile(r"/(.*?)/(.*?)/pull/(\d+)[\w]*")
 
-    def getChangeByURL(self, url):
+    def getChangeByURL(self, url, event):
         try:
             parsed = urllib.parse.urlparse(url)
         except ValueError:
@@ -81,14 +81,16 @@ class GithubSource(BaseSource):
             num = int(m.group(3))
         except ValueError:
             return None
-        pull, pr_obj = self.connection.getPull('%s/%s' % (org, proj), int(num))
+        pull, pr_obj = self.connection.getPull(
+            '%s/%s' % (org, proj), int(num), event=event)
         if not pull:
             return None
         proj = pull.get('base').get('repo').get('full_name')
         project = self.getProject(proj)
         change = self.connection._getChange(
             project, num,
-            patchset=pull.get('head').get('sha'))
+            patchset=pull.get('head').get('sha'),
+            event=event)
         return change
 
     def getChangesDependingOn(self, change, projects, tenant):

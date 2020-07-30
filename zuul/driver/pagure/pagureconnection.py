@@ -753,12 +753,13 @@ class PagureConnection(BaseConnection):
                  change.project.name, change.number, can_merge)
         return can_merge
 
-    def getPull(self, project_name, number):
+    def getPull(self, project_name, number, event=None):
+        log = get_annotated_logger(self.log, event=event)
         pagure = self.get_project_api_client(project_name)
         pr = pagure.get_pr(number)
         diffstats = pagure.get_pr_diffstats(number)
         pr['files'] = list(diffstats.keys())
-        self.log.info('Got PR %s#%s', project_name, number)
+        log.info('Got PR %s#%s', project_name, number)
         return pr
 
     def getStatus(self, project, number):

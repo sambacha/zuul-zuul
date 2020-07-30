@@ -38,7 +38,7 @@ class GitSource(BaseSource):
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
 
-    def getChangeByURL(self, url):
+    def getChangeByURL(self, url, event):
         return None
 
     def getChangesDependingOn(self, change, projects, tenant):

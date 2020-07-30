@@ -55,7 +55,7 @@ class GerritSource(BaseSource):
     def getChange(self, event, refresh=False):
         return self.connection.getChange(event, refresh)
 
-    def getChangeByURL(self, url):
+    def getChangeByURL(self, url, event):
         try:
             parsed = urllib.parse.urlparse(url)
         except ValueError:
@@ -71,11 +71,12 @@ class GerritSource(BaseSource):
         except ValueError:
             return None
         query = "change:%s" % (change_no,)
-        results = self.connection.simpleQuery(query)
+        results = self.connection.simpleQuery(query, event=event)
         if not results:
             return None
         change = self.connection._getChange(
-            results[0].number, results[0].current_patchset)
+            results[0].number, results[0].current_patchset,
+            event=event)
         return change
 
     def getChangesDependingOn(self, change, projects, tenant):

@@ -445,7 +445,7 @@ class PipelineManager(metaclass=ABCMeta):
             if not source:
                 continue
             log.debug("  Found source: %s", source)
-            dep = source.getChangeByURL(match)
+            dep = source.getChangeByURL(match, event)
             if dep and (not dep.is_merged) and dep not in dependencies:
                 log.debug("  Adding dependency: %s", dep)
                 dependencies.append(dep)

@@ -59,7 +59,7 @@ class BaseSource(object, metaclass=abc.ABCMeta):
         """
 
     @abc.abstractmethod
-    def getChangeByURL(self, url):
+    def getChangeByURL(self, url, event):
         """Get the change corresponding to the supplied URL.
 
         The URL may may not correspond to this source; if it doesn't,
