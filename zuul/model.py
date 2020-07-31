@@ -128,8 +128,7 @@ class ConfigurationErrorKey(object):
         if not isinstance(other, ConfigurationErrorKey):
             return False
         return (self.context == other.context and
-                self.mark.line == other.mark.line and
-                self.mark.snippet == other.mark.snippet and
+                self.mark == other.mark and
                 self.error_text == other.error_text)
 
 
