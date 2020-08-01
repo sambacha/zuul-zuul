@@ -141,8 +141,6 @@ for these more advanced operations.
 Promote
 ^^^^^^^
 
-.. note:: This command is only available through a Gearman connection.
-
 .. program-output:: zuul promote --help
 
 Example::
