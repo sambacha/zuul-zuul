@@ -113,6 +113,7 @@ class GitlabSource(BaseSource):
         f = GitlabRefFilter(
             connection_name=self.connection.connection_name,
             open=config.get('open'),
+            merged=config.get('merged'),
         )
         return [f]
 
@@ -127,6 +128,7 @@ class GitlabSource(BaseSource):
 def getRequireSchema():
     require = {
         'open': bool,
+        'merged': bool,
     }
     return require
 
