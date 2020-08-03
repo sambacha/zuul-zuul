@@ -456,8 +456,9 @@ class TestGithubDriver(ZuulTestCase):
         # We should only have one status for the head sha
         self.assertEqual(1, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
-                     (A.number, A.head_sha))
+        check_url = (
+            'http://zuul.example.com/t/tenant-one/status/change/%s,%s' %
+            (A.number, A.head_sha))
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('check status: pending',
                          check_status['description'])
@@ -472,13 +473,12 @@ class TestGithubDriver(ZuulTestCase):
         statuses = self.fake_github.getCommitStatuses(project, A.head_sha)
         self.assertEqual(2, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
-                     (A.number, A.head_sha))
+        check_url = 'http://zuul.example.com/t/tenant-one/buildset/'
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('check status: success',
                          check_status['description'])
         self.assertEqual('success', check_status['state'])
-        self.assertEqual(check_url, check_status['url'])
+        self.assertThat(check_status['url'], StartsWith(check_url))
         self.assertEqual(1, len(A.comments))
         self.assertThat(A.comments[0],
                         MatchesRegex(r'.*Build succeeded.*', re.DOTALL))
@@ -508,8 +508,7 @@ class TestGithubDriver(ZuulTestCase):
         self.assertEqual('success', report_status['state'])
         self.assertEqual(2, len(A.comments))
 
-        base = 'http://logs.example.com/tenant-one/reporting/%s/%s/' % (
-            A.project, A.number)
+        base = 'http://zuul.example.com/t/tenant-one/buildset/'
 
         # Deconstructing the URL because we don't save the BuildSet UUID
         # anywhere to do a direct comparison and doing regexp matches on a full
@@ -518,9 +517,9 @@ class TestGithubDriver(ZuulTestCase):
         # The first part of the URL matches the easy base string
         self.assertThat(report_status['url'], StartsWith(base))
 
-        # The rest of the URL is a UUID and a trailing slash.
+        # The rest of the URL is a UUID
         self.assertThat(report_status['url'][len(base):],
-                        MatchesRegex(r'^[a-fA-F0-9]{32}\/$'))
+                        MatchesRegex(r'^[a-fA-F0-9]{32}$'))
 
     @simple_layout('layouts/reporting-github.yaml', driver='github')
     def test_truncated_status_description(self):
@@ -750,8 +749,9 @@ class TestGithubDriver(ZuulTestCase):
         # We should only have one status for the head sha
         self.assertEqual(1, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
-                     (A.number, A.head_sha))
+        check_url = (
+            'http://zuul.example.com/t/tenant-one/status/change/%s,%s' %
+            (A.number, A.head_sha))
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('check status: pending', check_status['description'])
         self.assertEqual('pending', check_status['state'])
@@ -765,12 +765,11 @@ class TestGithubDriver(ZuulTestCase):
         statuses = self.fake_github.getCommitStatuses(project, A.head_sha)
         self.assertEqual(2, len(statuses))
         check_status = statuses[0]
-        check_url = ('http://zuul.example.com/status/#%s,%s' %
-                     (A.number, A.head_sha))
+        check_url = 'http://zuul.example.com/t/tenant-one/buildset/'
         self.assertEqual('tenant-one/check', check_status['context'])
         self.assertEqual('success', check_status['state'])
         self.assertEqual('check status: success', check_status['description'])
-        self.assertEqual(check_url, check_status['url'])
+        self.assertThat(check_status['url'], StartsWith(check_url))
         self.assertEqual(1, len(A.comments))
         self.assertThat(A.comments[0],
                         MatchesRegex(r'.*Build succeeded.*', re.DOTALL))
