@@ -51,8 +51,7 @@ FROM docker.io/opendevorg/python-base:3.7 as zuul
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=builder /output/ /output
-RUN /output/install-from-bindep \
-  && pip install --cache-dir=/output/wheels -r /output/zuul_base/requirements.txt \
+RUN /output/install-from-bindep zuul_base \
   && rm -rf /output
 RUN useradd -u 10001 -m -d /var/lib/zuul -c "Zuul Daemon" zuul
 
