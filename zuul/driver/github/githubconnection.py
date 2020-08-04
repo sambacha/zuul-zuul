@@ -951,7 +951,7 @@ class GithubClientManager:
             data = response.json()
 
             expiry = iso8601.parse_date(data['expires_at'])
-            expiry -= datetime.timedelta(minutes=3)
+            expiry -= datetime.timedelta(minutes=5)
             token = data['token']
 
             self.installation_token_cache[installation_id] = (token, expiry)
