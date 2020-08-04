@@ -1784,7 +1784,7 @@ class GithubConnection(BaseConnection):
     def mergePull(self, project, pr_number, commit_message='', sha=None,
                   method='merge', zuul_event_id=None):
         log = get_annotated_logger(self.log, zuul_event_id)
-        github = self.getGithubClient(project)
+        github = self.getGithubClient(project, zuul_event_id=zuul_event_id)
         owner, proj = project.split('/')
         pull_request = github.pull_request(owner, proj, pr_number)
         try:
