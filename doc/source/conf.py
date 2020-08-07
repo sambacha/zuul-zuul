@@ -34,7 +34,6 @@ extensions = [
     'sphinxcontrib.openapi',
     'zuul_sphinx',
     'zuul.sphinx.ansible',
-    'zuul.sphinx.zuul',
     'reno.sphinxext',
 ]
 #extensions = ['sphinx.ext.intersphinx']
@@ -43,7 +42,7 @@ extensions = [
 # The docs build references a non-local image served at zuul-ci.org.
 suppress_warnings = ['image.nonlocal_uri']
 
-primary_domain = 'zuuldoc'
+primary_domain = 'zuul'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
