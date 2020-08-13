@@ -107,19 +107,21 @@ dependencies and write new content.
 React Components and Styling
 ----------------------------
 
-Each page is a React Component. For instance the status.html page code is
-``web/src/pages/status.jsx``. It's usually a good way to not put too much markup
-in those page components, and create different components for this instead. This
-way, the page component can deal with the logic like reloading data if needed or
-evaluating URL parameters and the child components can deal with the markup.
-Thus, you will find a lot of components in the ``web/src/containers`` directory
-that mainly deal with the markup.
+Each page is a React Component. For instance the status.html page code
+is ``web/src/pages/status.jsx``. It is usually a good idea not to put
+too much markup in those page components and create different
+components for this instead. This way, the page component can deal
+with the logic like reloading data if needed or evaluating URL
+parameters and the child components can deal with the markup.  Thus,
+you will find a lot of components in the ``web/src/containers``
+directory that mainly deal with the markup.
 
 Mapping of pages/urls to components can be found in the route list in
 ``web/src/routes.js``.
 
-The best thing to get started is to check out the libraries that glue everything
-together. Those are `React`__, `react-router`_ and `Redux`_.
+The best way to get started is to check out the libraries that glue
+everything together. Those are `React`__, `react-router`_ and
+`Redux`_.
 
 .. _React-getting-started: https://reactjs.org/docs/getting-started.html
 
@@ -136,7 +138,7 @@ want to check out the `Usage and behaviour`_ section in their design guidelines.
 
 There is also a list of available `icons`_ including some recommendations on
 when to use which icon. In case you don't find an appropriate icon there, you
-could check out the `FontAwesome Free`_ icons, as most of the are included in
+could check out the `FontAwesome Free`_ icons, as most of them are included in
 PatternFly. To find out if an icon is available, simply try to import it from
 the ``@patternfly/react-icons`` package.
 
