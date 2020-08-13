@@ -68,7 +68,7 @@ class GitlabSource(BaseSource):
             num = int(m.group(2))
         except ValueError:
             return None
-        mr = self.connection.getPull(project_name, num, event=event)
+        mr = self.connection.getMR(project_name, num)
         if not mr:
             return None
         project = self.getProject(project_name)
@@ -114,6 +114,7 @@ class GitlabSource(BaseSource):
             connection_name=self.connection.connection_name,
             open=config.get('open'),
             merged=config.get('merged'),
+            approved=config.get('approved'),
         )
         return [f]
 
@@ -129,6 +130,7 @@ def getRequireSchema():
     require = {
         'open': bool,
         'merged': bool,
+        'approved': bool,
     }
     return require
 
