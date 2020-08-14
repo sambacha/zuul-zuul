@@ -765,6 +765,7 @@ class Merger(object):
         except Exception:
             log.exception("Unable to update %s/%s",
                           connection_name, project_name)
+            raise
 
     def checkoutBranch(self, connection_name, project_name, branch,
                        zuul_event_id=None):

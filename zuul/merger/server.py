@@ -129,12 +129,17 @@ class BaseMergeServer(metaclass=ABCMeta):
         self._update(connection_name, project_name)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
-        with lock:
-            files = self.merger.getFiles(connection_name, project_name,
-                                         args['branch'], args['files'],
-                                         args.get('dirs'))
-        result = dict(updated=True,
-                      files=files)
+        try:
+            self._update(connection_name, project_name)
+            with lock:
+                files = self.merger.getFiles(connection_name, project_name,
+                                             args['branch'], args['files'],
+                                             args.get('dirs'))
+        except Exception:
+            result = dict(update=False)
+        else:
+            result = dict(updated=True, files=files)
+
         job.sendWorkComplete(json.dumps(result))
 
     def merge(self, job):
@@ -184,12 +189,19 @@ class BaseMergeServer(metaclass=ABCMeta):
                      zuul_event_id=zuul_event_id)
 
         lock = self.repo_locks.getRepoLock(connection_name, project_name)
-        with lock:
-            files = self.merger.getFilesChanges(
-                connection_name, project_name, args['branch'], args['tosha'],
-                zuul_event_id=zuul_event_id)
-        result = dict(updated=True,
-                      files=files)
+        try:
+            self._update(connection_name, project_name,
+                         zuul_event_id=zuul_event_id)
+            with lock:
+                files = self.merger.getFilesChanges(
+                    connection_name, project_name,
+                    args['branch'], args['tosha'],
+                    zuul_event_id=zuul_event_id)
+        except Exception:
+            result = dict(update=False)
+        else:
+            result = dict(updated=True, files=files)
+
         result['zuul_event_id'] = zuul_event_id
         job.sendWorkComplete(json.dumps(result))
 
