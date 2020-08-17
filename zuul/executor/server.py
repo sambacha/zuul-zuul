@@ -1590,6 +1590,9 @@ class AnsibleJob(object):
                         if self.winrm_read_timeout is not None:
                             host_vars['ansible_winrm_read_timeout_sec'] = \
                                 self.winrm_read_timeout
+                    elif connection_type == "kubectl":
+                        host_vars['ansible_kubectl_context'] = \
+                            node.get('kubectl_context')
 
                 host_keys = []
                 for key in node.get('host_keys', []):
@@ -1906,17 +1909,23 @@ class AnsibleJob(object):
             }
         # Add cluster
         cluster_name = urlsplit(data['host']).netloc.replace('.', '-')
-        cluster = {
-            'server': data['host'],
-        }
-        if data.get('ca_crt'):
-            cluster['certificate-authority-data'] = data['ca_crt']
-        if data['skiptls']:
-            cluster['insecure-skip-tls-verify'] = True
-        kube_cfg['clusters'].append({
-            'name': cluster_name,
-            'cluster': cluster,
-        })
+
+        # Do not add a cluster/server that already exists in the kubeconfig
+        # because that leads to 'duplicate name' errors on multi-node builds.
+        # Also, as the cluster name directly corresponds to a server, there
+        # is no need to add it twice.
+        if cluster_name not in [c['name'] for c in kube_cfg['clusters']]:
+            cluster = {
+                'server': data['host'],
+            }
+            if data.get('ca_crt'):
+                cluster['certificate-authority-data'] = data['ca_crt']
+            if data['skiptls']:
+                cluster['insecure-skip-tls-verify'] = True
+            kube_cfg['clusters'].append({
+                'name': cluster_name,
+                'cluster': cluster,
+            })
 
         # Add user
         user_name = "%s:%s" % (data['namespace'], data['user'])
