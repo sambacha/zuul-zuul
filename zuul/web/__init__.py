@@ -344,25 +344,23 @@ class ZuulWebAPI(object):
             raise cherrypy.HTTPError(400,
                                      'Invalid request body')
 
-    def _enqueue(self, tenant, project, trigger, change, pipeline, **kwargs):
+    def _enqueue(self, tenant, project, change, pipeline, **kwargs):
         job = self.rpc.submitJob('zuul:enqueue',
                                  {'tenant': tenant,
                                   'pipeline': pipeline,
                                   'project': project,
-                                  'trigger': trigger,
                                   'change': change, })
         result = not job.failure
         resp = cherrypy.response
         resp.headers['Access-Control-Allow-Origin'] = '*'
         return result
 
-    def _enqueue_ref(self, tenant, project, trigger, ref,
+    def _enqueue_ref(self, tenant, project, ref,
                      oldrev, newrev, pipeline, **kwargs):
         job = self.rpc.submitJob('zuul:enqueue_ref',
                                  {'tenant': tenant,
                                   'pipeline': pipeline,
                                   'project': project,
-                                  'trigger': trigger,
                                   'ref': ref,
                                   'oldrev': oldrev,
                                   'newrev': newrev, })
