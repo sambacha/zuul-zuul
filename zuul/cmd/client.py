@@ -234,6 +234,7 @@ class Client(zuul.cmd.ZuulApp):
         cmd_enqueue = subparsers.add_parser('enqueue', help='enqueue a change')
         cmd_enqueue.add_argument('--tenant', help='tenant name',
                                  required=True)
+        # TODO(mhu) remove in a few releases
         cmd_enqueue.add_argument('--trigger',
                                  help='trigger name (deprecated and ignored. '
                                       'Kept only for backward compatibility)',

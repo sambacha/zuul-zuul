@@ -1545,8 +1545,7 @@ class TestTenantScopedWebApi(BaseTestWeb):
         autohold_requests = resp.json()
         self.assertEqual([], autohold_requests)
 
-    def test_enqueue(self):
-        """Test that the admin web interface can enqueue a change"""
+    def _test_enqueue(self, use_trigger=False):
         A = self.fake_gerrit.addFakeChange('org/project', 'master', 'A')
         A.addApproval('Code-Review', 2)
         A.addApproval('Approved', 1)
@@ -1563,9 +1562,10 @@ class TestTenantScopedWebApi(BaseTestWeb):
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
         enqueue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
-        change = {'trigger': 'gerrit',
-                  'change': '1,1',
+        change = {'change': '1,1',
                   'pipeline': 'gate', }
+        if use_trigger:
+            change['trigger'] = 'gerrit'
         req = self.post_url(path % enqueue_args,
                             headers={'Authorization': 'Bearer %s' % token},
                             json=change)
@@ -1575,7 +1575,16 @@ class TestTenantScopedWebApi(BaseTestWeb):
         self.assertEqual(True, data)
         self.waitUntilSettled()
 
-    def test_enqueue_ref(self):
+    def test_enqueue_with_deprecated_trigger(self):
+        """Test that the admin web interface can enqueue a change"""
+        # TODO(mhu) remove in a few releases
+        self._test_enqueue(use_trigger=True)
+
+    def test_enqueue(self):
+        """Test that the admin web interface can enqueue a change"""
+        self._test_enqueue()
+
+    def _test_enqueue_ref(self, use_trigger=False):
         """Test that the admin web interface can enqueue a ref"""
         p = "review.example.com/org/project"
         upstream = self.getUpstreamRepos([p])
@@ -1587,11 +1596,12 @@ class TestTenantScopedWebApi(BaseTestWeb):
         path = "api/tenant/%(tenant)s/project/%(project)s/enqueue"
         enqueue_args = {'tenant': 'tenant-one',
                         'project': 'org/project', }
-        ref = {'trigger': 'gerrit',
-               'ref': 'master',
+        ref = {'ref': 'master',
                'oldrev': '90f173846e3af9154517b88543ffbd1691f31366',
                'newrev': A_commit,
                'pipeline': 'post', }
+        if use_trigger:
+            ref['trigger'] = 'gerrit'
         authz = {'iss': 'zuul_operator',
                  'aud': 'zuul.example.com',
                  'sub': 'testuser',
@@ -1609,6 +1619,15 @@ class TestTenantScopedWebApi(BaseTestWeb):
         data = req.json()
         self.assertEqual(True, data)
         self.waitUntilSettled()
+
+    def test_enqueue_ref_with_deprecated_trigger(self):
+        """Test that the admin web interface can enqueue a ref"""
+        # TODO(mhu) remove in a few releases
+        self._test_enqueue_ref(use_trigger=True)
+
+    def test_enqueue_ref(self):
+        """Test that the admin web interface can enqueue a ref"""
+        self._test_enqueue_ref()
 
     def test_dequeue(self):
         """Test that the admin web interface can dequeue a change"""
@@ -2141,7 +2160,7 @@ class TestCLIViaWebApi(BaseTestWeb):
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'enqueue', '--tenant', 'tenant-one',
-             '--trigger', 'gerrit', '--project', 'org/project',
+             '--project', 'org/project',
              '--pipeline', 'gate', '--change', '1,1'],
             stdout=subprocess.PIPE)
         output = p.communicate()
@@ -2170,7 +2189,7 @@ class TestCLIViaWebApi(BaseTestWeb):
             [os.path.join(sys.prefix, 'bin/zuul'),
              '--zuul-url', self.base_url, '--auth-token', token,
              'enqueue-ref', '--tenant', 'tenant-one',
-             '--trigger', 'gerrit', '--project', 'org/project',
+             '--project', 'org/project',
              '--pipeline', 'post', '--ref', 'master',
              '--oldrev', '90f173846e3af9154517b88543ffbd1691f31366',
              '--newrev', A_commit],
