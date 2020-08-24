@@ -54,6 +54,10 @@ a.refresh {
 }
 
 /* Status page */
+.zuul-pipeline-header {
+    font-weight: var(--pf-global--FontWeight--bold);
+}
+
 .zuul-change {
     margin-bottom: 10px;
 }
