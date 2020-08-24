@@ -101,9 +101,15 @@ function Build(props) {
                 WrapElement={ListItem}
                 icon={<CodeBranchIcon />}
                 value={
-                  <>
-                    <strong>Branch </strong> {build.branch}
-                  </>
+                  build.branch ? (
+                    <>
+                      <strong>Branch </strong> {build.branch}
+                    </>
+                  ) : (
+                    <>
+                      <strong>Ref </strong> {build.ref}
+                    </>
+                  )
                 }
               />
               <IconProperty
