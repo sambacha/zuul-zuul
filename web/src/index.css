@@ -54,7 +54,7 @@ a.refresh {
 }
 
 /* Status page */
-.zuul-pipeline-header {
+.zuul-pipeline-header h3 {
     font-weight: var(--pf-global--FontWeight--bold);
 }
 
@@ -106,7 +106,7 @@ a.refresh {
 }
 
 /* Force_break_very_long_non_hyphenated_repo_names */
-.change_project {
+.change_project {
     word-break: break-all;
 }
 
