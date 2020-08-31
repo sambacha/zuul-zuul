@@ -263,7 +263,7 @@ class NodesProvisionedEvent(ResultEvent):
 class Scheduler(threading.Thread):
     """The engine of Zuul.
 
-    The Scheduler is reponsible for recieving events and dispatching
+    The Scheduler is responsible for receiving events and dispatching
     them to appropriate components (including pipeline managers,
     mergers and executors).
 
