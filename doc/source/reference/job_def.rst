@@ -348,7 +348,7 @@ Here is an example of two job definitions:
       .. code-block:: yaml
 
          ssh_key:
-           key: descrypted-secret-key-data
+           key: decrypted-secret-key-data
 
    .. attr:: nodeset
 
